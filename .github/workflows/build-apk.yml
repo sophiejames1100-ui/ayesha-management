@@ -27,6 +27,22 @@ jobs:
       - name: Generate Flutter Platform Files
         run: flutter create . --project-name ayesha_candidate_management --org com.ayesha --platforms android
 
+      - name: Fix Android Namespace for old plugins
+        run: |
+          cat <<EOF >> android/build.gradle
+          subprojects {
+              afterEvaluate { project ->
+                  if (project.hasProperty("android")) {
+                      project.android {
+                          if (namespace == null) {
+                              namespace project.group
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
       - name: Overwrite with Custom Source
         run: cp -r src/* lib/
 
